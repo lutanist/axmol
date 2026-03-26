@@ -308,4 +308,8 @@ spAnimationState* SkeletonAnimation::getState() const {
 	return _state;
 }
 
+#ifdef EC_SEVENHEARTS_EXTENSIONS
+#include "SkeletonAnimationEC.inc"
+#endif
+
 }

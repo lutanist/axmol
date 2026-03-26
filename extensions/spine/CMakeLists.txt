@@ -14,6 +14,9 @@ file(GLOB_RECURSE _AX_SPINE_HEADER
 
 add_library(${target_name} ${_AX_SPINE_HEADER} ${_AX_SPINE_SRC})
 
+# SevenHearts custom extensions (EC engine modifications)
+target_compile_definitions(${target_name} PUBLIC EC_SEVENHEARTS_EXTENSIONS)
+
 if(BUILD_SHARED_LIBS)
     target_compile_definitions(${target_name} 
         PRIVATE SPINEPLUGIN_API=DLLEXPORT

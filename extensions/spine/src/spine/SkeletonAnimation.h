@@ -102,6 +102,10 @@ public:
 	spAnimationState* getState() const;
 	//void setUpdateOnlyIfVisible(bool status);
 
+#ifdef EC_SEVENHEARTS_EXTENSIONS
+#include "SkeletonAnimationEC.inl"
+#endif
+
 	SkeletonAnimation ();
 	virtual ~SkeletonAnimation ();
 	virtual void initialize () override;
@@ -121,6 +125,12 @@ protected:
 	EventListener _eventListener;
 	// UpdateWorldTransformsListener _preUpdateListener;
 	// UpdateWorldTransformsListener _postUpdateListener;
+
+#ifdef EC_SEVENHEARTS_EXTENSIONS
+	float _preAniTime = 0.f;
+	float _curAniTime = 0.f;
+	bool _isPaused = false;
+#endif
 
 private:
 	typedef SkeletonRenderer super;
