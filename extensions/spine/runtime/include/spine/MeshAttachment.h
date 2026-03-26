@@ -1,122 +1,91 @@
 /******************************************************************************
- * Spine Runtimes License Agreement
- * Last updated July 28, 2023. Replaces all prior versions.
+ * Spine Runtimes Software License v2.5
  *
- * Copyright (c) 2013-2023, Esoteric Software LLC
+ * Copyright (c) 2013-2016, Esoteric Software
+ * All rights reserved.
  *
- * Integration of the Spine Runtimes into software or otherwise creating
- * derivative works of the Spine Runtimes is permitted under the terms and
- * conditions of Section 2 of the Spine Editor License Agreement:
- * http://esotericsoftware.com/spine-editor-license
+ * You are granted a perpetual, non-exclusive, non-sublicensable, and
+ * non-transferable license to use, install, execute, and perform the Spine
+ * Runtimes software and derivative works solely for personal or internal
+ * use. Without the written permission of Esoteric Software (see Section 2 of
+ * the Spine Software License Agreement), you may not (a) modify, translate,
+ * adapt, or develop new applications using the Spine Runtimes or otherwise
+ * create derivative works or improvements of the Spine Runtimes or (b) remove,
+ * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
+ * or other intellectual property or proprietary rights notices on or in the
+ * Software, including any copy thereof. Redistributions in binary or source
+ * form must include this license and terms.
  *
- * Otherwise, it is permitted to integrate the Spine Runtimes into software or
- * otherwise create derivative works of the Spine Runtimes (collectively,
- * "Products"), provided that each user of the Products must obtain their own
- * Spine Editor license and redistribution of the Products in any form must
- * include this license and copyright notice.
- *
- * THE SPINE RUNTIMES ARE PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY
- * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
- * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THE
- * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+ * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
+ * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef Spine_MeshAttachment_h
-#define Spine_MeshAttachment_h
+#ifndef SPINE_MESHATTACHMENT_H_
+#define SPINE_MESHATTACHMENT_H_
 
+#include <spine/dll.h>
+#include <spine/Attachment.h>
 #include <spine/VertexAttachment.h>
-#include <spine/TextureRegion.h>
-#include <spine/Sequence.h>
-#include <spine/Vector.h>
-#include <spine/Color.h>
-#include <spine/HasRendererObject.h>
+#include <spine/Atlas.h>
+#include <spine/Slot.h>
 
-namespace spine {
-	/// Attachment that displays a texture region using a mesh.
-	class SP_API MeshAttachment : public VertexAttachment {
-		friend class SkeletonBinary;
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-		friend class SkeletonJson;
+typedef struct spMeshAttachment spMeshAttachment;
+struct spMeshAttachment {
+	spVertexAttachment super;
 
-		friend class AtlasAttachmentLoader;
+	void* rendererObject;
+	int regionOffsetX, regionOffsetY; /* Pixels stripped from the bottom left, unrotated. */
+	int regionWidth, regionHeight; /* Unrotated, stripped pixel size. */
+	int regionOriginalWidth, regionOriginalHeight; /* Unrotated, unstripped pixel size. */
+	float regionU, regionV, regionU2, regionV2;
+	int/*bool*/regionRotate;
 
-	RTTI_DECL
+	const char* path;
 
-	public:
-		explicit MeshAttachment(const String &name);
+	float* regionUVs;
+	float* uvs;
 
-		virtual ~MeshAttachment();
+	int trianglesCount;
+	unsigned short* triangles;
 
-		using VertexAttachment::computeWorldVertices;
+	spColor color;
 
-		virtual void computeWorldVertices(Slot &slot, size_t start, size_t count, float *worldVertices, size_t offset,
-		size_t stride = 2);
+	int hullLength;
 
-		void updateRegion();
+	spMeshAttachment* const parentMesh;
+	int/*bool*/inheritDeform;
 
-		int getHullLength();
+	/* Nonessential. */
+	int edgesCount;
+	int* edges;
+	float width, height;
+};
 
-		void setHullLength(int inValue);
+SP_API spMeshAttachment* spMeshAttachment_create (const char* name);
+SP_API void spMeshAttachment_updateUVs (spMeshAttachment* self);
+SP_API void spMeshAttachment_setParentMesh (spMeshAttachment* self, spMeshAttachment* parentMesh);
 
-		Vector<float> &getRegionUVs();
+#ifdef SPINE_SHORT_NAMES
+typedef spMeshAttachment MeshAttachment;
+#define MeshAttachment_create(...) spMeshAttachment_create(__VA_ARGS__)
+#define MeshAttachment_updateUVs(...) spMeshAttachment_updateUVs(__VA_ARGS__)
+#define MeshAttachment_setParentMesh(...) spMeshAttachment_setParentMesh(__VA_ARGS__)
+#endif
 
-		/// The UV pair for each vertex, normalized within the entire texture. See also MeshAttachment::updateRegion
-		Vector<float> &getUVs();
-
-		Vector<unsigned short> &getTriangles();
-
-		Color &getColor();
-
-		const String &getPath();
-
-		void setPath(const String &inValue);
-
-		TextureRegion *getRegion();
-
-		void setRegion(TextureRegion *region);
-
-		Sequence *getSequence();
-
-		void setSequence(Sequence *sequence);
-
-		MeshAttachment *getParentMesh();
-
-		void setParentMesh(MeshAttachment *inValue);
-
-		// Nonessential.
-		Vector<unsigned short> &getEdges();
-
-		float getWidth();
-
-		void setWidth(float inValue);
-
-		float getHeight();
-
-		void setHeight(float inValue);
-
-		virtual Attachment *copy();
-
-		MeshAttachment *newLinkedMesh();
-
-	private:
-		MeshAttachment *_parentMesh;
-		Vector<float> _uvs;
-		Vector<float> _regionUVs;
-		Vector<unsigned short> _triangles;
-		Vector<unsigned short> _edges;
-		String _path;
-		Color _color;
-		int _hullLength;
-		int _width, _height;
-		TextureRegion *_region;
-		Sequence *_sequence;
-	};
+#ifdef __cplusplus
 }
+#endif
 
-#endif /* Spine_MeshAttachment_h */
+#endif /* SPINE_MESHATTACHMENT_H_ */

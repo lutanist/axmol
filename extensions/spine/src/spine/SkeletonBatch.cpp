@@ -1,16 +1,16 @@
 /******************************************************************************
  * Spine Runtimes License Agreement
- * Last updated July 28, 2023. Replaces all prior versions.
+ * Last updated January 1, 2020. Replaces all prior versions.
  *
- * Copyright (c) 2013-2023, Esoteric Software LLC
+ * Copyright (c) 2013-2020, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
  * conditions of Section 2 of the Spine Editor License Agreement:
  * http://esotericsoftware.com/spine-editor-license
  *
- * Otherwise, it is permitted to integrate the Spine Runtimes into software or
- * otherwise create derivative works of the Spine Runtimes (collectively,
+ * Otherwise, it is permitted to integrate the Spine Runtimes into software
+ * or otherwise create derivative works of the Spine Runtimes (collectively,
  * "Products"), provided that each user of the Products must obtain their own
  * Spine Editor license and redistribution of the Products in any form must
  * include this license and copyright notice.
@@ -23,8 +23,8 @@
  * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
  * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THE
- * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
 #include <spine/spine-axmol.h>
@@ -99,7 +99,7 @@ namespace spine {
 		
 			command->_locMVP     = currentState->getUniformLocation(backend::UNIFORM_NAME_MVP_MATRIX);
 	        command->_locTexture = currentState->getUniformLocation(backend::UNIFORM_NAME_TEXTURE);
-	}
+		}
 		return currentState;
 	}
 
@@ -107,11 +107,11 @@ namespace spine {
 		reset();
 	}
 
-	axmol::V3F_C4B_T2F *SkeletonBatch::allocateVertices(uint32_t numVertices) {
+	ax::V3F_C4B_T2F *SkeletonBatch::allocateVertices(uint32_t numVertices) {
 		if (_vertices.size() - _numVertices < numVertices) {
-			axmol::V3F_C4B_T2F *oldData = _vertices.data();
+			ax::V3F_C4B_T2F *oldData = _vertices.data();
 			_vertices.resize((_vertices.size() + numVertices) * 2 + 1);
-			axmol::V3F_C4B_T2F *newData = _vertices.data();
+			ax::V3F_C4B_T2F *newData = _vertices.data();
 			for (uint32_t i = 0; i < this->_nextFreeCommand; i++) {
 				SkeletonCommand *command = _commandsPool[i];
 				SkeletonCommand::Triangles &triangles = (SkeletonCommand::Triangles &) command->getTriangles();
@@ -119,7 +119,7 @@ namespace spine {
 			}
 		}
 
-		axmol::V3F_C4B_T2F *vertices = _vertices.data() + _numVertices;
+		ax::V3F_C4B_T2F *vertices = _vertices.data() + _numVertices;
 		_numVertices += numVertices;
 		return vertices;
 	}
@@ -129,34 +129,39 @@ namespace spine {
 	}
 
 
-	unsigned short *SkeletonBatch::allocateIndices(uint32_t numIndices) {
-		if (_indices.getCapacity() - _indices.size() < numIndices) {
-			unsigned short *oldData = _indices.buffer();
-			int oldSize = (int)_indices.size();
-			_indices.ensureCapacity(_indices.size() + numIndices);
-			unsigned short *newData = _indices.buffer();
-			for (uint32_t i = 0; i < this->_nextFreeCommand; i++) {
-				auto command = _commandsPool[i];
-				auto &triangles = (SkeletonCommand::Triangles &) command->getTriangles();
-				if (triangles.indices >= oldData && triangles.indices < oldData + oldSize) {
-					triangles.indices = newData + (triangles.indices - oldData);
-				}
-			}
-		}
+	unsigned short* SkeletonBatch::allocateIndices(uint32_t numIndices)
+    {
+        if (_indices.size() - _numIndices < numIndices)
+        {
+            auto oldSize            = _indices.size();
+            unsigned short* oldData = _indices.data();
+            _indices.resize((_indices.size() + numIndices) * 2 + 1);
+            unsigned short* newData = _indices.data();
+            for (uint32_t i = 0; i < this->_nextFreeCommand; i++)
+            {
+                TrianglesCommand* command = _commandsPool[i];
+                ax::TrianglesCommand::Triangles& triangles =
+                    (ax::TrianglesCommand::Triangles&)command->getTriangles();
+                if (triangles.indices >= oldData && triangles.indices < oldData + oldSize)
+                {
+                    triangles.indices = newData + (triangles.indices - oldData);
+                }
+            }
+        }
 
-		unsigned short *indices = _indices.buffer() + _indices.size();
-		_indices.setSize(_indices.size() + numIndices, 0);
-		return indices;
-	}
+        unsigned short* indices = _indices.data() + _numIndices;
+        _numIndices += numIndices;
+        return indices;
+    }
 
 	void SkeletonBatch::deallocateIndices(uint32_t numIndices) {
-		_indices.setSize(_indices.size() - numIndices, 0);
+        _numIndices -= numIndices;
 	}
 
 
-	axmol::TrianglesCommand *SkeletonBatch::addCommand(axmol::Renderer *renderer, float globalOrder, axmol::Texture2D *texture, backend::ProgramState *programState, axmol::BlendFunc blendType, const axmol::TrianglesCommand::Triangles &triangles, const axmol::Mat4 &mv, uint32_t flags) {
+	ax::TrianglesCommand *SkeletonBatch::addCommand(ax::Renderer *renderer, float globalOrder, ax::Texture2D *texture, backend::ProgramState *programState, ax::BlendFunc blendType, const ax::TrianglesCommand::Triangles &triangles, const ax::Mat4 &mv, uint32_t flags) {
 		SkeletonCommand *command = nextFreeCommand();
-		const axmol::Mat4 &projectionMat = Director::getInstance()->getMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_PROJECTION);
+		const ax::Mat4 &projectionMat = Director::getInstance()->getMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_PROJECTION);
 
 		if (programState == nullptr)
 			programState = _programState;
@@ -176,12 +181,12 @@ namespace spine {
 	void SkeletonBatch::reset() {
 		_nextFreeCommand = 0;
 		_numVertices = 0;
-		_indices.setSize(0, 0);
+        _numIndices  = 0;
 	}
 
 	SkeletonCommand *SkeletonBatch::nextFreeCommand() {
-		if (_commandsPool.size() <= (int)_nextFreeCommand) {
-			unsigned int newSize = (int)_commandsPool.size() * 2 + 1;
+		if (_commandsPool.size() <= _nextFreeCommand) {
+			unsigned int newSize = _commandsPool.size() * 2 + 1;
 			for (int i = _commandsPool.size(); i < newSize; i++) {
 				_commandsPool.push_back(newCommand());
 			}

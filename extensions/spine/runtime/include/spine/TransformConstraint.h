@@ -1,113 +1,81 @@
 /******************************************************************************
- * Spine Runtimes License Agreement
- * Last updated July 28, 2023. Replaces all prior versions.
+ * Spine Runtimes Software License v2.5
  *
- * Copyright (c) 2013-2023, Esoteric Software LLC
+ * Copyright (c) 2013-2016, Esoteric Software
+ * All rights reserved.
  *
- * Integration of the Spine Runtimes into software or otherwise creating
- * derivative works of the Spine Runtimes is permitted under the terms and
- * conditions of Section 2 of the Spine Editor License Agreement:
- * http://esotericsoftware.com/spine-editor-license
+ * You are granted a perpetual, non-exclusive, non-sublicensable, and
+ * non-transferable license to use, install, execute, and perform the Spine
+ * Runtimes software and derivative works solely for personal or internal
+ * use. Without the written permission of Esoteric Software (see Section 2 of
+ * the Spine Software License Agreement), you may not (a) modify, translate,
+ * adapt, or develop new applications using the Spine Runtimes or otherwise
+ * create derivative works or improvements of the Spine Runtimes or (b) remove,
+ * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
+ * or other intellectual property or proprietary rights notices on or in the
+ * Software, including any copy thereof. Redistributions in binary or source
+ * form must include this license and terms.
  *
- * Otherwise, it is permitted to integrate the Spine Runtimes into software or
- * otherwise create derivative works of the Spine Runtimes (collectively,
- * "Products"), provided that each user of the Products must obtain their own
- * Spine Editor license and redistribution of the Products in any form must
- * include this license and copyright notice.
- *
- * THE SPINE RUNTIMES ARE PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY
- * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
- * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THE
- * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+ * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
+ * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef Spine_TransformConstraint_h
-#define Spine_TransformConstraint_h
+#ifndef SPINE_TRANSFORMCONSTRAINT_H_
+#define SPINE_TRANSFORMCONSTRAINT_H_
 
-#include <spine/ConstraintData.h>
+#include <spine/dll.h>
+#include <spine/TransformConstraintData.h>
+#include <spine/Bone.h>
 
-#include <spine/Vector.h>
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-namespace spine {
-	class TransformConstraintData;
+struct spSkeleton;
 
-	class Skeleton;
+typedef struct spTransformConstraint {
+	spTransformConstraintData* const data;
+	int bonesCount;
+	spBone** const bones;
+	spBone* target;
+	float rotateMix, translateMix, scaleMix, shearMix;
 
-	class Bone;
+#ifdef __cplusplus
+	spTransformConstraint() :
+		data(0),
+		bonesCount(0),
+		bones(0),
+		target(0),
+		rotateMix(0),
+		translateMix(0),
+		scaleMix(0),
+		shearMix(0) {
+	}
+#endif
+} spTransformConstraint;
 
-	class SP_API TransformConstraint : public Updatable {
-		friend class Skeleton;
+SP_API spTransformConstraint* spTransformConstraint_create (spTransformConstraintData* data, const struct spSkeleton* skeleton);
+SP_API void spTransformConstraint_dispose (spTransformConstraint* self);
 
-		friend class TransformConstraintTimeline;
+SP_API void spTransformConstraint_apply (spTransformConstraint* self);
 
-	RTTI_DECL
+#ifdef SPINE_SHORT_NAMES
+typedef spTransformConstraint TransformConstraint;
+#define TransformConstraint_create(...) spTransformConstraint_create(__VA_ARGS__)
+#define TransformConstraint_dispose(...) spTransformConstraint_dispose(__VA_ARGS__)
+#define TransformConstraint_apply(...) spTransformConstraint_apply(__VA_ARGS__)
+#endif
 
-	public:
-		TransformConstraint(TransformConstraintData &data, Skeleton &skeleton);
-
-		virtual void update(Physics physics);
-
-		virtual int getOrder();
-
-		TransformConstraintData &getData();
-
-		Vector<Bone *> &getBones();
-
-		Bone *getTarget();
-
-		void setTarget(Bone *inValue);
-
-		float getMixRotate();
-
-		void setMixRotate(float inValue);
-
-		float getMixX();
-
-		void setMixX(float inValue);
-
-		float getMixY();
-
-		void setMixY(float inValue);
-
-		float getMixScaleX();
-
-		void setMixScaleX(float inValue);
-
-		float getMixScaleY();
-
-		void setMixScaleY(float inValue);
-
-		float getMixShearY();
-
-		void setMixShearY(float inValue);
-
-		bool isActive();
-
-		void setActive(bool inValue);
-
-        void setToSetupPose();
-
-	private:
-		TransformConstraintData &_data;
-		Vector<Bone *> _bones;
-		Bone *_target;
-		float _mixRotate, _mixX, _mixY, _mixScaleX, _mixScaleY, _mixShearY;
-		bool _active;
-
-		void applyAbsoluteWorld();
-
-		void applyRelativeWorld();
-
-		void applyAbsoluteLocal();
-
-		void applyRelativeLocal();
-	};
+#ifdef __cplusplus
 }
+#endif
 
-#endif /* Spine_TransformConstraint_h */
+#endif /* SPINE_TRANSFORMCONSTRAINT_H_ */
