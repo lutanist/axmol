@@ -12,6 +12,10 @@
 
 #include "flatbuffers/flatbuffers.h"
 
+#ifdef SH_CSB_HD_SCALE
+#include "base/Director.h"
+#endif
+
 using namespace ax;
 using namespace ui;
 using namespace flatbuffers;
@@ -436,7 +440,12 @@ void TextReader::setPropsWithFlatBuffers(ax::Node* node, const flatbuffers::Tabl
     bool touchScaleEnabled = options->touchScaleEnable() != 0;
     label->setTouchScaleChangeEnabled(touchScaleEnabled);
 
+#ifdef SH_CSB_HD_SCALE
+    const float csbScale = 1.0f / ax::Director::getInstance()->getContentScaleFactor();
+    int fontSize = static_cast<int>(options->fontSize() * csbScale);
+#else
     int fontSize = options->fontSize();
+#endif
     label->setFontSize(fontSize);
 
     Size areaSize = Size(options->areaWidth(), options->areaHeight());

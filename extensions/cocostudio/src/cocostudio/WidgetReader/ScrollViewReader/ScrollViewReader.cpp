@@ -11,6 +11,10 @@
 
 #include "flatbuffers/flatbuffers.h"
 
+#ifdef SH_CSB_HD_SCALE
+#include "base/Director.h"
+#endif
+
 using namespace ax;
 using namespace ui;
 using namespace flatbuffers;
@@ -493,8 +497,16 @@ void ScrollViewReader::setPropsWithFlatBuffers(ax::Node* node, const flatbuffers
     int opacity = widgetOptions->alpha();
     scrollView->setOpacity(opacity);
 
+#ifdef SH_CSB_HD_SCALE
+    const float csbScale = 1.0f / ax::Director::getInstance()->getContentScaleFactor();
+#endif
+
     auto f_innerSize = options->innerSize();
+#ifdef SH_CSB_HD_SCALE
+    Size innerSize(f_innerSize->width() * csbScale, f_innerSize->height() * csbScale);
+#else
     Size innerSize(f_innerSize->width(), f_innerSize->height());
+#endif
     scrollView->setInnerContainerSize(innerSize);
     int direction = options->direction();
     scrollView->setDirection((ScrollView::Direction)direction);
@@ -521,14 +533,22 @@ void ScrollViewReader::setPropsWithFlatBuffers(ax::Node* node, const flatbuffers
         scrollView->setBackGroundImageCapInsets(capInsets);
 
         auto f_scale9Size = options->scale9Size();
+#ifdef SH_CSB_HD_SCALE
+        Size scale9Size(f_scale9Size->width() * csbScale, f_scale9Size->height() * csbScale);
+#else
         Size scale9Size(f_scale9Size->width(), f_scale9Size->height());
+#endif
         scrollView->setContentSize(scale9Size);
     }
     else
     {
         if (!scrollView->isIgnoreContentAdaptWithSize())
         {
+#ifdef SH_CSB_HD_SCALE
+            Size contentSize(widgetOptions->size()->width() * csbScale, widgetOptions->size()->height() * csbScale);
+#else
             Size contentSize(widgetOptions->size()->width(), widgetOptions->size()->height());
+#endif
             scrollView->setContentSize(contentSize);
         }
     }

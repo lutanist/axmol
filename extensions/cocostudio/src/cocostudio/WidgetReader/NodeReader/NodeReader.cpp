@@ -30,6 +30,7 @@
 
 #include "flatbuffers/flatbuffers.h"
 #include "ui/UILayoutComponent.h"
+#include "base/Director.h"
 
 using namespace ax;
 using namespace flatbuffers;
@@ -436,8 +437,15 @@ void NodeReader::setPropsWithFlatBuffers(ax::Node* node, const flatbuffers::Tabl
     auto options = (WidgetOptions*)(nodeOptions);
 
     std::string name = options->name()->c_str();
+#ifdef SH_CSB_HD_SCALE
+    // .csb 좌표가 HD 해상도로 저장 — 디자인 좌표계에 맞춤
+    const float csbScale = 1.0f / ax::Director::getInstance()->getContentScaleFactor();
+    float x          = options->position()->x() * csbScale;
+    float y          = options->position()->y() * csbScale;
+#else
     float x          = options->position()->x();
     float y          = options->position()->y();
+#endif
     float scalex     = options->scale()->x();
     float scaley     = options->scale()->y();
     //    float rotation      = options.rotation();
@@ -449,14 +457,25 @@ void NodeReader::setPropsWithFlatBuffers(ax::Node* node, const flatbuffers::Tabl
     int tag             = options->tag();
     int actionTag       = options->actionTag();
     bool visible        = options->visible() != 0;
-    float w             = options->size()->width();
-    float h             = options->size()->height();
+#ifdef SH_CSB_HD_SCALE
+    float w             = options->size()->width() * csbScale;
+    float h             = options->size()->height() * csbScale;
+#else
+    auto w             = options->size()->width();
+    auto h             = options->size()->height();
+#endif
     int alpha           = options->alpha();
     Color3B color(options->color()->r(), options->color()->g(), options->color()->b());
 
+#ifdef SH_CSB_CASCADE_COMPAT
+    // 원본 cocos2d-x: 항상 true (csb 데이터 무시)
+    node->setCascadeColorEnabled(true);
+    node->setCascadeOpacityEnabled(true);
+#else
     // x-studio 10.0.593.0: read from .csb.
     node->setCascadeColorEnabled(options->cascadeColorEnabled());
     node->setCascadeOpacityEnabled(options->cascadeOpacityEnabled());
+#endif
 
     std::string customProperty = options->customProperty()->c_str();
 

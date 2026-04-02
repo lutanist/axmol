@@ -10,6 +10,10 @@
 
 #include "flatbuffers/flatbuffers.h"
 
+#ifdef SH_CSB_HD_SCALE
+#include "base/Director.h"
+#endif
+
 using namespace ax;
 using namespace ui;
 using namespace flatbuffers;
@@ -284,7 +288,12 @@ void TextFieldReader::setPropsWithFlatBuffers(ax::Node* node, const flatbuffers:
         textField->setString(text);
     }
 
+#ifdef SH_CSB_HD_SCALE
+    const float csbScale = 1.0f / ax::Director::getInstance()->getContentScaleFactor();
+    int fontSize = static_cast<int>(options->fontSize() * csbScale);
+#else
     int fontSize = options->fontSize();
+#endif
     textField->setFontSize(fontSize);
 
     std::string fontName = options->fontName()->c_str();
@@ -337,7 +346,11 @@ void TextFieldReader::setPropsWithFlatBuffers(ax::Node* node, const flatbuffers:
     if (!textField->isIgnoreContentAdaptWithSize())
     {
         ((Label*)(textField->getVirtualRenderer()))->setLineBreakWithoutSpace(true);
+#ifdef SH_CSB_HD_SCALE
+        Size contentSize(widgetOptions->size()->width() * csbScale, widgetOptions->size()->height() * csbScale);
+#else
         Size contentSize(widgetOptions->size()->width(), widgetOptions->size()->height());
+#endif
         textField->setContentSize(contentSize);
     }
 }

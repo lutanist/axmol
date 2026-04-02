@@ -12,6 +12,10 @@
 
 #include "flatbuffers/flatbuffers.h"
 
+#ifdef SH_CSB_HD_SCALE
+#include "base/Director.h"
+#endif
+
 using namespace ax;
 using namespace ui;
 using namespace flatbuffers;
@@ -340,22 +344,38 @@ void ImageViewReader::setPropsWithFlatBuffers(ax::Node* node, const flatbuffers:
     auto widgetReader = WidgetReader::getInstance();
     widgetReader->setPropsWithFlatBuffers(node, (Table*)options->widgetOptions());
 
+#ifdef SH_CSB_HD_SCALE
+    const float csbScale = 1.0f / ax::Director::getInstance()->getContentScaleFactor();
+#endif
+
     if (scale9Enabled)
     {
         imageView->setUnifySizeEnabled(false);
         imageView->ignoreContentAdaptWithSize(false);
 
         auto f_scale9Size = options->scale9Size();
+#ifdef SH_CSB_HD_SCALE
+        Size scale9Size(f_scale9Size->width() * csbScale, f_scale9Size->height() * csbScale);
+#else
         Size scale9Size(f_scale9Size->width(), f_scale9Size->height());
+#endif
         imageView->setContentSize(scale9Size);
 
         auto f_capInset = options->capInsets();
+#ifdef SH_CSB_HD_SCALE
+        Rect capInsets(f_capInset->x() * csbScale, f_capInset->y() * csbScale, f_capInset->width() * csbScale, f_capInset->height() * csbScale);
+#else
         Rect capInsets(f_capInset->x(), f_capInset->y(), f_capInset->width(), f_capInset->height());
+#endif
         imageView->setCapInsets(capInsets);
     }
     else
     {
+#ifdef SH_CSB_HD_SCALE
+        Size contentSize(options->widgetOptions()->size()->width() * csbScale, options->widgetOptions()->size()->height() * csbScale);
+#else
         Size contentSize(options->widgetOptions()->size()->width(), options->widgetOptions()->size()->height());
+#endif
         imageView->setContentSize(contentSize);
     }
 }

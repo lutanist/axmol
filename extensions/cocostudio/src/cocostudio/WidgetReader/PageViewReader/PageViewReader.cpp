@@ -12,6 +12,10 @@
 
 #include "flatbuffers/flatbuffers.h"
 
+#ifdef SH_CSB_HD_SCALE
+#include "base/Director.h"
+#endif
+
 using namespace ax;
 using namespace ui;
 using namespace flatbuffers;
@@ -397,21 +401,37 @@ void PageViewReader::setPropsWithFlatBuffers(ax::Node* node, const flatbuffers::
     auto widgetReader = WidgetReader::getInstance();
     widgetReader->setPropsWithFlatBuffers(node, (Table*)options->widgetOptions());
 
+#ifdef SH_CSB_HD_SCALE
+    const float csbScale = 1.0f / ax::Director::getInstance()->getContentScaleFactor();
+#endif
+
     if (backGroundScale9Enabled)
     {
         auto f_capInsets = options->capInsets();
+#ifdef SH_CSB_HD_SCALE
+        Rect capInsets(f_capInsets->x() * csbScale, f_capInsets->y() * csbScale, f_capInsets->width() * csbScale, f_capInsets->height() * csbScale);
+#else
         Rect capInsets(f_capInsets->x(), f_capInsets->y(), f_capInsets->width(), f_capInsets->height());
+#endif
         pageView->setBackGroundImageCapInsets(capInsets);
 
         auto f_scale9Size = options->scale9Size();
+#ifdef SH_CSB_HD_SCALE
+        Size scale9Size(f_scale9Size->width() * csbScale, f_scale9Size->height() * csbScale);
+#else
         Size scale9Size(f_scale9Size->width(), f_scale9Size->height());
+#endif
         pageView->setContentSize(scale9Size);
     }
     else
     {
         if (!pageView->isIgnoreContentAdaptWithSize())
         {
+#ifdef SH_CSB_HD_SCALE
+            Size contentSize(widgetOptions->size()->width() * csbScale, widgetOptions->size()->height() * csbScale);
+#else
             Size contentSize(widgetOptions->size()->width(), widgetOptions->size()->height());
+#endif
             pageView->setContentSize(contentSize);
         }
     }

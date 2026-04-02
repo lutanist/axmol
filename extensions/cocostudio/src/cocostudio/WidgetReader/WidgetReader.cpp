@@ -787,7 +787,12 @@ void WidgetReader::setPropsWithFlatBuffers(ax::Node* node, const flatbuffers::Ta
     widget->setUnifySizeEnabled(false);
     widget->setLayoutComponentEnabled(true);
     widget->ignoreContentAdaptWithSize(false);
+#ifdef SH_CSB_HD_SCALE
+    const float csbScale = 1.0f / ax::Director::getInstance()->getContentScaleFactor();
+    Size contentSize(options->size()->width() * csbScale, options->size()->height() * csbScale);
+#else
     Size contentSize(options->size()->width(), options->size()->height());
+#endif
     widget->setContentSize(contentSize);
 
     int tag = options->tag();
@@ -813,7 +818,11 @@ void WidgetReader::setPropsWithFlatBuffers(ax::Node* node, const flatbuffers::Ta
     std::string name = options->name()->c_str();
     widget->setName(name);
 
+#ifdef SH_CSB_HD_SCALE
+    Vec2 position(options->position()->x() * csbScale, options->position()->y() * csbScale);
+#else
     Vec2 position(options->position()->x(), options->position()->y());
+#endif
     widget->setPosition(position);
 
     float scaleX = options->scale()->x();

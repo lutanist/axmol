@@ -10,4 +10,11 @@ endif()
 
 target_include_directories(${target_name} PUBLIC src)
 
+# SevenHearts: .csb HD 좌표 스케일링 + cascade 플래그 호환
+target_compile_definitions(${target_name} PUBLIC
+    SH_AXMOL_EXTENSIONS
+    SH_CSB_HD_SCALE
+    SH_CSB_CASCADE_COMPAT
+)
+
 setup_ax_extension_config(${target_name})

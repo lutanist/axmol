@@ -1209,7 +1209,14 @@ Node* CSLoader::nodeWithFlatBuffers(const flatbuffers::NodeTree* nodetree, const
         // If node is invalid, there is no necessity to process children of node.
         if (!node)
         {
+            AXLOGD("[CSLoader] classname='{}' → node is null", classname);
             return nullptr;
+        }
+        {
+            auto sz = node->getContentSize();
+            auto pos = node->getPosition();
+            AXLOGD("[CSLoader] classname='{}', size=({},{}), pos=({},{})",
+                   classname, sz.width, sz.height, pos.x, pos.y);
         }
 
         auto children = nodetree->children();

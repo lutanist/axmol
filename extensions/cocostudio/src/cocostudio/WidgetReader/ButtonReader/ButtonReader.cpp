@@ -13,6 +13,10 @@
 
 #include "flatbuffers/flatbuffers.h"
 
+#ifdef SH_CSB_HD_SCALE
+#include "base/Director.h"
+#endif
+
 using namespace ax;
 using namespace ui;
 using namespace flatbuffers;
@@ -879,7 +883,12 @@ void ButtonReader::setPropsWithFlatBuffers(ax::Node* node, const flatbuffers::Ta
             errorFilePath = path;
     }
 
+#ifdef SH_CSB_HD_SCALE
+    const float csbScale = 1.0f / ax::Director::getInstance()->getContentScaleFactor();
+    int titleFontSize = static_cast<int>(options->fontSize() * csbScale);
+#else
     int titleFontSize = options->fontSize();
+#endif
     button->setTitleFontSize(titleFontSize);
 
     bool displaystate = options->displaystate() != 0;
@@ -931,15 +940,27 @@ void ButtonReader::setPropsWithFlatBuffers(ax::Node* node, const flatbuffers::Ta
         button->ignoreContentAdaptWithSize(false);
 
         auto f_capInsets = options->capInsets();
+#ifdef SH_CSB_HD_SCALE
+        Rect capInsets(f_capInsets->x() * csbScale, f_capInsets->y() * csbScale, f_capInsets->width() * csbScale, f_capInsets->height() * csbScale);
+#else
         Rect capInsets(f_capInsets->x(), f_capInsets->y(), f_capInsets->width(), f_capInsets->height());
+#endif
         button->setCapInsets(capInsets);
 
+#ifdef SH_CSB_HD_SCALE
+        Size scale9Size(options->scale9Size()->width() * csbScale, options->scale9Size()->height() * csbScale);
+#else
         Size scale9Size(options->scale9Size()->width(), options->scale9Size()->height());
+#endif
         button->setContentSize(scale9Size);
     }
     else
     {
+#ifdef SH_CSB_HD_SCALE
+        Size contentSize(options->widgetOptions()->size()->width() * csbScale, options->widgetOptions()->size()->height() * csbScale);
+#else
         Size contentSize(options->widgetOptions()->size()->width(), options->widgetOptions()->size()->height());
+#endif
         button->setContentSize(contentSize);
     }
 
