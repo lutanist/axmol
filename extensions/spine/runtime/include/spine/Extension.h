@@ -155,6 +155,9 @@ extern "C" {
 void _spAtlasPage_createTexture (spAtlasPage* self, const char* path);
 void _spAtlasPage_disposeTexture (spAtlasPage* self);
 char* _spUtil_readFile (const char* path, int* length);
+#ifdef SH_SPINE_ATLAS_SPRITEFRAME_CACHE
+void _spAtlasPage_addSpriteFrame (spAtlasPage* self, spAtlasRegion* region);
+#endif
 
 #ifdef SPINE_SHORT_NAMES
 #define _AtlasPage_createTexture(...) _spAtlasPage_createTexture(__VA_ARGS__)

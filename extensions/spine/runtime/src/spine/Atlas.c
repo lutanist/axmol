@@ -298,6 +298,10 @@ spAtlas* spAtlas_create(const char* begin, int length, const char* dir, void* re
 
 			if (!readValue(&begin, end, &str)) return abortAtlas(self);
 			region->index = toInt(&str);
+
+#ifdef SH_SPINE_ATLAS_SPRITEFRAME_CACHE
+			_spAtlasPage_addSpriteFrame(page, region);
+#endif
 		}
 	}
 

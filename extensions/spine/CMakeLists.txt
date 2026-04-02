@@ -15,7 +15,11 @@ file(GLOB_RECURSE _AX_SPINE_HEADER
 add_library(${target_name} ${_AX_SPINE_HEADER} ${_AX_SPINE_SRC})
 
 # SevenHearts custom extensions (EC engine modifications)
-target_compile_definitions(${target_name} PUBLIC EC_SEVENHEARTS_EXTENSIONS)
+target_compile_definitions(${target_name} PUBLIC
+    SH_AXMOL_EXTENSIONS
+    SH_SPINE_ATLAS_SPRITEFRAME_CACHE
+    SH_SPINE_CUSTOM_METHODS
+)
 
 if(BUILD_SHARED_LIBS)
     target_compile_definitions(${target_name} 

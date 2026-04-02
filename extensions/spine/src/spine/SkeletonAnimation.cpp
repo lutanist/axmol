@@ -308,7 +308,7 @@ spAnimationState* SkeletonAnimation::getState() const {
 	return _state;
 }
 
-#ifdef EC_SEVENHEARTS_EXTENSIONS
+#ifdef SH_SPINE_CUSTOM_METHODS
 #include "SkeletonAnimationEC.inc"
 #endif
 

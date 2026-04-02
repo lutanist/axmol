@@ -74,8 +74,9 @@ void _spAtlasPage_createTexture (spAtlasPage* self, const char* path) {
 	if (!texture) {
 		texture = Director::getInstance()->getTextureCache()->addImage(path);
 	}
-	auto hasPremultiAlpha = texture->hasPremultipliedAlpha();
 	AXASSERT(texture != nullptr, "Invalid image");
+	if (!texture) return;
+	auto hasPremultiAlpha = texture->hasPremultipliedAlpha();
 	texture->retain();
 
 	Texture2D::TexParams textureParams = {filter(self->minFilter), filter(self->magFilter), wrap(self->uWrap), wrap(self->vWrap)};
@@ -85,6 +86,25 @@ void _spAtlasPage_createTexture (spAtlasPage* self, const char* path) {
 	self->width = texture->getPixelsWide();
 	self->height = texture->getPixelsHigh();
 }
+
+#ifdef SH_SPINE_ATLAS_SPRITEFRAME_CACHE
+void _spAtlasPage_addSpriteFrame (spAtlasPage* self, spAtlasRegion* region) {
+	Texture2D* texture = (Texture2D*)self->rendererObject;
+	std::string frameName = fmt::format("{}.png", region->name);
+
+	if (!SpriteFrameCache::getInstance()->getSpriteFrameByName(frameName))
+	{
+		SpriteFrame* frame = SpriteFrame::createWithTexture(texture,
+			Rect(region->x, region->y, region->width, region->height),
+			region->rotate,
+			Vec2(region->offsetX, region->offsetY),
+			Size((float)region->originalWidth, (float)region->originalHeight));
+
+		if (frame)
+			SpriteFrameCache::getInstance()->addSpriteFrame(frame, frameName);
+	}
+}
+#endif
 
 void _spAtlasPage_disposeTexture (spAtlasPage* self) {
 	((Texture2D*)self->rendererObject)->release();

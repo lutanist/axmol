@@ -102,7 +102,7 @@ public:
 	spAnimationState* getState() const;
 	//void setUpdateOnlyIfVisible(bool status);
 
-#ifdef EC_SEVENHEARTS_EXTENSIONS
+#ifdef SH_SPINE_CUSTOM_METHODS
 #include "SkeletonAnimationEC.inl"
 #endif
 
@@ -126,7 +126,7 @@ protected:
 	// UpdateWorldTransformsListener _preUpdateListener;
 	// UpdateWorldTransformsListener _postUpdateListener;
 
-#ifdef EC_SEVENHEARTS_EXTENSIONS
+#ifdef SH_SPINE_CUSTOM_METHODS
 	float _preAniTime = 0.f;
 	float _curAniTime = 0.f;
 	bool _isPaused = false;

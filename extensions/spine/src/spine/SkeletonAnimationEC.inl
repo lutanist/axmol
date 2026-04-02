@@ -1,5 +1,5 @@
 // SevenHearts (EternalClash) custom extensions for spine::SkeletonAnimation.
-// Included inside the class definition via #ifdef EC_SEVENHEARTS_EXTENSIONS.
+// Included inside the class definition via #ifdef SH_SPINE_CUSTOM_METHODS.
 // Keep this file separate so upstream spine-axmol merges don't conflict.
 
 public:

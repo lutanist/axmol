@@ -1,5 +1,5 @@
 // SevenHearts (EternalClash) custom extensions for spine::SkeletonAnimation.
-// Included inside SkeletonAnimation.cpp via #ifdef EC_SEVENHEARTS_EXTENSIONS.
+// Included inside SkeletonAnimation.cpp via #ifdef SH_SPINE_CUSTOM_METHODS.
 // Keep this file separate so upstream spine-axmol merges don't conflict.
 
 bool SkeletonAnimation::isEndedAnimation() {
