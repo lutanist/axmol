@@ -1124,11 +1124,13 @@ void EventDispatcher::dispatchTouchEvent(EventTouch* event)
 
                 if (isClaimed && listener->_isRegistered && listener->_needSwallow)
                 {
+#ifndef SH_TOUCH_NO_SWALLOW_ALLATONCE
                     if (isNeedsMutableSet)
                     {
                         mutableTouchesIter = mutableTouches.erase(mutableTouchesIter);
                         isSwallowed        = true;
                     }
+#endif
                     return true;
                 }
 

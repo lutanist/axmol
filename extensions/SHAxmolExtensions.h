@@ -43,4 +43,13 @@
 // axmol은 .csb에서 읽지만, 원본은 무조건 true였음.
 // #define SH_CSB_CASCADE_COMPAT  -- defined in CMake
 
+// --- EventDispatcher ---
+
+// OneByOne(swallowTouches=true) 리스너가 터치를 삼켜도
+// AllAtOnce 리스너의 mutableTouches에서 제거하지 않음.
+// 원본: EventDispatcher.cpp에 #ifdef ETERNAL_CLASH로 동일 수정.
+// SceneMainLoop(AllAtOnce)이 ScrollView(OneByOne,swallow)와
+// 공존하기 위해 필요 — 나무 터치, NPC 터치 등 onTouchesEnded 기반 처리.
+// #define SH_TOUCH_NO_SWALLOW_ALLATONCE  -- defined in CMake
+
 #endif // SH_AXMOL_EXTENSIONS

@@ -471,6 +471,9 @@ if(_simdc_defines)
   endif()
 endif()
 
+# SevenHearts: EventDispatcher customization
+target_compile_definitions(${_AX_CORE_LIB} PUBLIC SH_TOUCH_NO_SWALLOW_ALLATONCE)
+
 # 3rd libs
 add_subdirectory(${_AX_ROOT}/3rdparty ${ENGINE_BINARY_PATH}/3rdparty)
 target_link_libraries(${_AX_CORE_LIB} 3rdparty)
