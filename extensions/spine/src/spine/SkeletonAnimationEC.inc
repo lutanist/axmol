@@ -128,3 +128,11 @@ void SkeletonAnimation::setDefaultMix(float duration) {
 		_state->data->defaultMix = duration;
 	}
 }
+
+SkeletonAnimation::SkeletonDataRefCountCallback SkeletonAnimation::s_increaseRefCountCallback = nullptr;
+SkeletonAnimation::SkeletonDataRefCountCallback SkeletonAnimation::s_decreaseRefCountCallback = nullptr;
+
+void SkeletonAnimation::setRefCountCallbacks(SkeletonDataRefCountCallback increase, SkeletonDataRefCountCallback decrease) {
+	s_increaseRefCountCallback = increase;
+	s_decreaseRefCountCallback = decrease;
+}

@@ -73,6 +73,9 @@ SkeletonAnimation* SkeletonAnimation::createWithData (spSkeletonData* skeletonDa
 	SkeletonAnimation* node = new SkeletonAnimation();
 	node->initWithData(skeletonData, ownsSkeletonData);
 	node->autorelease();
+#ifdef SH_SPINE_CUSTOM_METHODS
+	if (s_increaseRefCountCallback) s_increaseRefCountCallback(skeletonData);
+#endif
 	return node;
 }
 
@@ -125,6 +128,9 @@ SkeletonAnimation::SkeletonAnimation ()
 }
 
 SkeletonAnimation::~SkeletonAnimation () {
+#ifdef SH_SPINE_CUSTOM_METHODS
+	if (s_decreaseRefCountCallback) s_decreaseRefCountCallback(_state->data->skeletonData);
+#endif
 	if (_ownsAnimationStateData) spAnimationStateData_dispose(_state->data);
 	spAnimationState_dispose(_state);
 }
@@ -136,6 +142,13 @@ void SkeletonAnimation::update (float deltaTime) {
 	spAnimationState_update(_state, deltaTime);
 	spAnimationState_apply(_state, _skeleton);
 	spSkeleton_updateWorldTransform(_skeleton);
+
+#ifdef SH_SPINE_CUSTOM_METHODS
+	// Update animation time tracking for getAniTime()/getPreAniTime()
+	_preAniTime = _curAniTime;
+	spTrackEntry* entry = spAnimationState_getCurrent(_state, 0);
+	if (entry) _curAniTime = entry->trackTime;
+#endif
 }
 
 void SkeletonAnimation::draw(ax::Renderer *renderer, const ax::Mat4 &transform, uint32_t transformFlags) {

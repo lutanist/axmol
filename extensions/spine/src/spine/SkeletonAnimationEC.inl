@@ -51,6 +51,13 @@ public:
 	void setBlendMode(int mode) {}
 	void setBlended(bool blended) {}
 
+	// Skeleton data reference counting (matches original EC engine customization)
+	// Game code sets these callbacks to hook into SkeletonDataResourceManager/CharacterResourceManager.
+	typedef void (*SkeletonDataRefCountCallback)(spSkeletonData* data);
+	static SkeletonDataRefCountCallback s_increaseRefCountCallback;
+	static SkeletonDataRefCountCallback s_decreaseRefCountCallback;
+	static void setRefCountCallbacks(SkeletonDataRefCountCallback increase, SkeletonDataRefCountCallback decrease);
+
 	// Listener convenience
 	void setCompleteListener(std::nullptr_t) { _completeListener = nullptr; }
 	void setEndListener(std::nullptr_t) { _endListener = nullptr; }
