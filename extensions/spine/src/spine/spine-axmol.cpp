@@ -92,17 +92,18 @@ void _spAtlasPage_addSpriteFrame (spAtlasPage* self, spAtlasRegion* region) {
 	Texture2D* texture = (Texture2D*)self->rendererObject;
 	std::string frameName = fmt::format("{}.png", region->name);
 
-	if (!SpriteFrameCache::getInstance()->getSpriteFrameByName(frameName))
-	{
-		SpriteFrame* frame = SpriteFrame::createWithTexture(texture,
-			Rect(region->x, region->y, region->width, region->height),
-			region->rotate,
-			Vec2(region->offsetX, region->offsetY),
-			Size((float)region->originalWidth, (float)region->originalHeight));
+	// SevenHearts: SpriteFrameCache::getSpriteFrameByName logs "isn't found"
+	// when missing, which would spam during first-time atlas load. addSpriteFrame()
+	// silently overwrites existing entries, so we just register unconditionally.
+	// (Original code did a pre-check via getSpriteFrameByName.)
+	SpriteFrame* frame = SpriteFrame::createWithTexture(texture,
+		Rect(region->x, region->y, region->width, region->height),
+		region->rotate,
+		Vec2(region->offsetX, region->offsetY),
+		Size((float)region->originalWidth, (float)region->originalHeight));
 
-		if (frame)
-			SpriteFrameCache::getInstance()->addSpriteFrame(frame, frameName);
-	}
+	if (frame)
+		SpriteFrameCache::getInstance()->addSpriteFrame(frame, frameName);
 }
 #endif
 
