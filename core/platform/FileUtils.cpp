@@ -696,10 +696,15 @@ std::string FileUtils::fullPathForFilename(std::string_view filename) const
         }
     }
 
+#ifndef SH_QUIET_MISSING_FILE_LOG
+    // SevenHearts: SHFileUtils intentionally probes many candidate paths
+    // (.ecp/.png, /g_ language fallbacks, font basename), causing massive
+    // log spam. Silenced via SH_QUIET_MISSING_FILE_LOG (defined in CMake).
     if (isPopupNotify())
     {
         AXLOGD("fullPathForFilename: No file found at {}. Possible missing file.", filename);
     }
+#endif
 
     // The file wasn't found, return empty string.
     return std::string{};

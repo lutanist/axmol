@@ -471,8 +471,12 @@ if(_simdc_defines)
   endif()
 endif()
 
-# SevenHearts: EventDispatcher customization
-target_compile_definitions(${_AX_CORE_LIB} PUBLIC SH_TOUCH_NO_SWALLOW_ALLATONCE)
+# SevenHearts: engine customizations (see extensions/SHAxmolExtensions.h)
+target_compile_definitions(${_AX_CORE_LIB} PUBLIC
+    SH_TOUCH_NO_SWALLOW_ALLATONCE
+    SH_QUIET_MISSING_FILE_LOG
+    SH_VEC2_EXPLICIT_FLOAT_PTR
+)
 
 # 3rd libs
 add_subdirectory(${_AX_ROOT}/3rdparty ${ENGINE_BINARY_PATH}/3rdparty)

@@ -102,7 +102,14 @@ public:
      *
      * @param array An array containing the elements of the vector in the order x, y.
      */
+    // SevenHearts: explicit to prevent integer literal 0 → nullptr → crash via
+    // implicit conversion (e.g. setContentOffset(0, y) calls that incorrectly
+    // bind 0 to Vec2(const float*)). Defined in CMake as SH_VEC2_EXPLICIT_FLOAT_PTR.
+#ifdef SH_VEC2_EXPLICIT_FLOAT_PTR
+    constexpr explicit Vec2(const float* array) { set(array); }
+#else
     constexpr Vec2(const float* array) { set(array); }
+#endif
 
     /**
      * Constructs a vector that describes the direction between the specified points.

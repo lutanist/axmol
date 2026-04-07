@@ -52,4 +52,20 @@
 // 공존하기 위해 필요 — 나무 터치, NPC 터치 등 onTouchesEnded 기반 처리.
 // #define SH_TOUCH_NO_SWALLOW_ALLATONCE  -- defined in CMake
 
+// --- FileUtils ---
+
+// fullPathForFilename "No file found at ..." 로그 silencing.
+// SHFileUtils가 의도적으로 여러 후보 경로를 탐색(.ecp/.png, /g_ 다국어,
+// font basename) 하기 때문에 정상 동작 중에도 로그가 폭주.
+// #define SH_QUIET_MISSING_FILE_LOG  -- defined in CMake
+
+// --- Math ---
+
+// Vec2(const float* array) 생성자에 explicit 부착.
+// 정수 리터럴 0이 nullptr로 암시 변환되어 setContentOffset(0, y) 같은
+// 호출에서 런타임 nullptr 역참조 크래시 발생하던 케이스 방지
+// (마이그레이션 중 cocos2d-x ScrollView::setContentOffset(Point, bool) 2-인자
+// 오버로드가 axmol에는 없는데 코드는 그대로 남아있어서 발생).
+// #define SH_VEC2_EXPLICIT_FLOAT_PTR  -- defined in CMake
+
 #endif // SH_AXMOL_EXTENSIONS
